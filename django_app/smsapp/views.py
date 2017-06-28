@@ -1,32 +1,52 @@
-from django.shortcuts import render
-
 # Create your views here.
 import sys
+
+from django.http import HttpResponse
+from django.shortcuts import render, redirect
 from sdk.api.message import Message
 from sdk.exceptions import CoolsmsException
+from smsapi.apis import api_key, api_secret
+from smsapp.forms import SmsForm
 
-if __name__ == '__main__':
-    api_key = 'NCSGLMHSQ2FTVZUA'
-    api_secret = '2ZNM5ZPZR07QHSLHVIFAH3XZR1GAGM2F'
 
-    params = dict()
-    params['type'] = 'sms'
-    params['to'] = '01048152941'
-    params['from'] = '01029953874'
-    params['text'] = '보내져라 얍얍'
+def sms_send(request):
+    form = SmsForm(data=request.POST)
 
-    cool = Message(api_key, api_secret)
-    try:
-        response = cool.send(params)
-        print('Success Count : {}'.format(response['success_count']))
-        print('Error Count : {}'.format(response['error_count']))
-        print('Group ID : {}'.format(response['group_id']))
+    def get_valid_sms_info_and_save():
+        get_valid_params = {
+            'type': request.POST.get('msg_type'),
+            'to': request.POST.get('msg_getter'),
+            'from': request.POST.get('msg_sender'),
+            'text': request.POST.get('msg_text'),
+        }
+        form.save()
+        return get_valid_params
 
-        if 'error_list' in response:
-            print('Error List : {}'.format(response['error_list']))
+    if request.method == "POST":
+        try:
+            params = get_valid_sms_info_and_save()
+            cool = Message(api_key, api_secret)
+            response = cool.send(params)
+            success_count = response['success_count']
+            print(success_count)
+            error_count = response['error_count']
+            print(error_count)
+            print('Group ID : {}'.format(response['group_id']))
 
-    except CoolsmsException as e:
-        print('Error Code : {}'.format(e.code))
-        print('Error Message : {}'.format(e.msg))
+            if 'error_list' in response:
+                print('Error List : {}'.format(response['error_list']))
+            context = {
+                'form': form,
+                'success_count': success_count,
+                'error_count': error_count,
+            }
+            return render(request, 'smsapp/sms_result.html', context)
 
-    sys.exit()
+        except CoolsmsException as e:
+            return HttpResponse('Error : {} - {}'.format(e.code, e.msg))
+    else:
+        form = SmsForm()
+    context = {
+        'form': form,
+    }
+    return render(request, 'smsapp/sms_send.html', context)

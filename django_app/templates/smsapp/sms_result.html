@@ -1,0 +1,11 @@
+{% extends 'common/base.html' %}
+
+{% block content %}
+{% if success_count == 1 and error_count == 0 %}
+    <h3>메세지 전송 성공하였습니다.</h3>
+{% elif error_count == 1 and success_count == 0 %}
+    <h3>메세지 전송에 실패하였습니다.</h3>
+{% else %}
+    <p>메세지를 보내보세요!</p>
+{% endif %}
+{% endblock %}

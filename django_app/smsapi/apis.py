@@ -1,0 +1,5 @@
+api_key = 'NCSGLMHSQ2FTVZUA'
+api_secret = '2ZNM5ZPZR07QHSLHVIFAH3XZR1GAGM2F'
+
+api_owner_num = '01029953874'
+msg_getter_num = '01048152941'
