@@ -6,7 +6,7 @@
 .idea/
 
 ### API Files ###
-./smsapi/apis.py
+django_app/smsapi/apis.py
 
 ### Django ###
 *.log
